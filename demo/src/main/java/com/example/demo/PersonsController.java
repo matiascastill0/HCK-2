@@ -1,29 +1,35 @@
 package com.example.demo;
 
+import com.example.demo.Persons;
+import com.example.demo.Groups;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class PersonsController {
-    private Persons persons;
 
-    public PersonsController() {
-        this.persons = new Persons();
-    }
+@RestController
+public class PersonController {
 
-    public void addPerson(String name, int age) {
-        Person person = new Person(name, age);
-        persons.addPerson(person);
-    }
+    private List<Person> persons = // Inicializa tu lista de personas aquí
 
+    @GetMapping("/persons")
     public List<Person> getAllPersons() {
-        return persons.getPersons();
+        return persons;
     }
 
-    public static void main(String[] args) {
-        PersonsController controller = new PersonsController();
-        controller.addPerson("John Doe", 30);
-        List<Person> allPersons = controller.getAllPersons();
-        for (Person person : allPersons) {
-            System.out.println("Name: " + person.getName() + ", Age: " + person.getAge());
+    @GetMapping("/persons/{id}")
+    public Person getPersonById(@PathVariable Long id) {
+        return persons.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    @GetMapping("/persons/groups/{id}")
+    public List<Group> getGroupsByPersonId(@PathVariable Long id) {
+        Person person = getPersonById(id);
+        if (person != null) {
+            return person.getGroups();
         }
+        return null;
     }
 }
